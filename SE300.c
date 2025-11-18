@@ -23,9 +23,9 @@ int balance;
   Manager GameManager;
   Manager BettingManager;
   printf("***********GAME START**********\n");
-  
+
   mainMenu();
-  
+
   return 0;
 }
 
@@ -41,17 +41,17 @@ void mainMenu() {  // Alex's note: probably a much better way to do this,
     printf("Input: ");
     while(loop=1){
         while(check==1) {
-            printf("\nLoop\n");
-            getchar();
-            if(scanf("%d%c", &input, &term) != 2 || term != '\n') {  // Input buffer, doesn't always work for some reason
-                printf("failure\n");
+//            printf("\nLoop\n");
+            if(scanf("%d%c", &input, &term) != 2 || term != '\n') {  // Input buffer
+                printf("\nInvalid Input\n\nInput: ");
+                getchar();
                 check=1;
             }
             else {
                 check=0;
             }
         }
-        printf("Exit Loop\n");
+//        printf("Exit Loop\n");
         switch(input) {
             case 1:
                 printf("\nStarting New Game...\n");
@@ -69,6 +69,7 @@ void mainMenu() {  // Alex's note: probably a much better way to do this,
                 return;
             default:
                 printf("\nInvalid Input...\n\nPlease Re-Enter Input: ");
+                while((getchar())!='\n');
                 loop=1;
                 break;
         }
