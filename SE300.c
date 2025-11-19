@@ -175,9 +175,9 @@ void tutorial() {
     printf(" Dealer- Computer opponent that deals cards\n\n");
 
     printf("Card Values: \n");
-    printf("Number Cards (2-10) = Face value: \n");
-    printf("Face Cards (J, Q, K) = 10 \n");
-    printf("Ace (A) = 11 or 1 when hand total would be higher than 21 \n");
+    printf(" Number Cards (2-10) = Face value: \n");
+    printf(" Face Cards (J, Q, K) = 10 \n");
+    printf(" Ace (A) = 11 or 1 when hand total would be higher than 21 \n");
 
     printf("Betting Rules: \n");
 
@@ -194,8 +194,15 @@ void tutorial() {
     printf("- Players can surrender late\n\n");
 
     printf("How to Play: \n");
+    printf(" 1. Place your bet\n");
+    printf(" 2. You and dealer each receive 2 cards\n");
+    printf(" 3. Dealer shows 1 card face up\n");
+    printf(" 4. Choose your action: Hit, Hold, Double Down, or Split\n");
+    printf(" 5. Dealer reveals hidden card and plays\n");
+    printf(" 6. Winner determined by the closest to 21 without busting wins\n\n");
 
   
     return;
 }
+
 
