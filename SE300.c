@@ -42,7 +42,7 @@ void mainMenu() {  // Alex's note: probably a much better way to do this,
     int check=1;
     char term;
     printf("-----------------------------------------------\n");
-    printf("                    Main Menu                 \n");
+    printf("            Welcome to Blackjack                \n");
     printf("-----------------------------------------------\n\n");
     printf("1. Start New Game\n");
     printf("2. Rules/Tutorial\n");
@@ -206,6 +206,7 @@ void tutorial() {
   
     return;
 }
+
 
 
 
