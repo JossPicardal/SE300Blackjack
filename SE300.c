@@ -158,6 +158,44 @@ void cardManager() {
 
 }
 void tutorial() {
-    printf("\nTutorial\n");
+     printf("-----------------------------------------------\n");
+    printf("                Rules/Tutorial                 \n");
+    printf("-----------------------------------------------\n\n");
+
+    printf("Objective: Beat the dealer by having your hands total value closer to 21 without busting (going over 21)\n");
+
+    printf("Terminology: \n");
+    printf(" Hit- Get another card from dealer\n");
+    printf(" Bust- Card amount is greater than 21\n");
+    printf(" Hold- Skip your turn\n");
+    printf(" Blackjack- First 2 cards dealt equal 21\n");
+    printf(" Double Down- Doubles current bet and deals a single card, can only be done after initial 2 cards are dealt\n");
+    printf(" Split- Split current hand into 2 hands; an equal bet to the starting bet must be on each hand\n");
+    printf(" Hand- Current set of cards a player has \n");
+    printf(" Dealer- Computer opponent that deals cards\n\n");
+
+    printf("Card Values: \n");
+    printf("Number Cards (2-10) = Face value: \n");
+    printf("Face Cards (J, Q, K) = 10 \n");
+    printf("Ace (A) = 11 or 1 when hand total would be higher than 21 \n");
+
+    printf("Betting Rules: \n");
+
+    printf("American Blackjack Rules: \n");
+    printf("- American Blackjack payouts for Blackjack are 3:2 or 6:5\n");
+    printf("- The hole card allows the dealer to peek for Blackjack on Ace up-cards and 10s\n");
+    printf("- The dealer must hold on a soft 17\n");
+    printf("- Players can double down on any hand sum\n");
+    printf("- Players can split hands up to three times\n");
+    printf("- Players can double down after a split\n");
+    printf("- Aces can only be split once\n");
+    printf("- 10-value cards can be split, even if they are different\n");
+    printf("- Six or eight decks of cards are used\n");
+    printf("- Players can surrender late\n\n");
+
+    printf("How to Play: \n");
+
+  
     return;
 }
+
