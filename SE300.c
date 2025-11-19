@@ -41,11 +41,12 @@ void mainMenu() {  // Alex's note: probably a much better way to do this,
     int loop=1;
     int check=1;
     char term;
-    printf("Main Menu...\n");
+    printf("-----------------------------------------------\n");
+    printf("                    Main Menu                 \n");
+    printf("-----------------------------------------------\n\n");
     printf("1. Start New Game\n");
     printf("2. Rules/Tutorial\n");
-    printf("3. Exit G2
-      ame\n");
+    printf("3. Exit Game\n");
     printf("Input: ");
     while(loop=1){
         while(check==1) {
@@ -166,14 +167,14 @@ void tutorial() {
     printf("Objective: Beat the dealer by having your hands total value closer to 21 without busting (going over 21)\n\n");
 
     printf("Terminology: \n");
-    printf(" Hit- Get another card from dealer\n");
-    printf(" Bust- Card amount is greater than 21\n");
-    printf(" Hold- Skip your turn\n");
-    printf(" Blackjack- First 2 cards dealt equal 21\n");
-    printf(" Double Down- Doubles current bet and deals a single card, can only be done after initial 2 cards are dealt\n");
-    printf(" Split- Split current hand into 2 hands; an equal bet to the starting bet must be on each hand\n");
-    printf(" Hand- Current set of cards a player has \n");
-    printf(" Dealer- Computer opponent that deals cards\n\n");
+    printf(" Hit         - Get another card from dealer\n");
+    printf(" Bust        - Card amount is greater than 21\n");
+    printf(" Hold        - Skip your turn\n");
+    printf(" Blackjack   - First 2 cards dealt equal 21\n");
+    printf(" Double Down - Doubles current bet and deals a single card, can only be done after initial 2 cards are dealt\n");
+    printf(" Split       - Split current hand into 2 hands; an equal bet to the starting bet must be on each hand\n");
+    printf(" Hand        - Current set of cards a player has \n");
+    printf(" Dealer      - Computer opponent that deals cards\n\n");
 
     printf("Card Values: \n");
     printf(" Number Cards (2-10) = Face value: \n");
@@ -205,6 +206,7 @@ void tutorial() {
   
     return;
 }
+
 
 
 
