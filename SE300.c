@@ -42,9 +42,10 @@ void mainMenu() {  // Alex's note: probably a much better way to do this,
     int check=1;
     char term;
     printf("Main Menu...\n");
-    printf("Enter 1 to start new game\n");
-    printf("Enter 2 to enter the tutorial\n");
-    printf("Enter 3 to exit game\n");
+    printf("1. Start New Game\n");
+    printf("2. Rules/Tutorial\n");
+    printf("3. Exit G2
+      ame\n");
     printf("Input: ");
     while(loop=1){
         while(check==1) {
@@ -162,7 +163,7 @@ void tutorial() {
     printf("                Rules/Tutorial                 \n");
     printf("-----------------------------------------------\n\n");
 
-    printf("Objective: Beat the dealer by having your hands total value closer to 21 without busting (going over 21)\n");
+    printf("Objective: Beat the dealer by having your hands total value closer to 21 without busting (going over 21)\n\n");
 
     printf("Terminology: \n");
     printf(" Hit- Get another card from dealer\n");
@@ -177,7 +178,7 @@ void tutorial() {
     printf("Card Values: \n");
     printf(" Number Cards (2-10) = Face value: \n");
     printf(" Face Cards (J, Q, K) = 10 \n");
-    printf(" Ace (A) = 11 or 1 when hand total would be higher than 21 \n");
+    printf(" Ace (A) = 11 or 1 when hand total would be higher than 21 \n\n");
 
     printf("Betting Rules: \n");
 
@@ -204,5 +205,6 @@ void tutorial() {
   
     return;
 }
+
 
 
