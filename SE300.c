@@ -24,6 +24,7 @@ struct cards* cardManager(int hCount);
 void printCards(struct cards card[], int count);
 void playerTurn(struct cards* hand, int* size);
 int handValue(struct cards* hand, int size);
+void dealerTurn(struct cards card[], int* count);
 
 int main(){
   printf("***********GAME START**********\n");
@@ -87,13 +88,13 @@ void mainMenu() {  // Alex's note: probably a much better way to do this,
 void game() {
 //    printf("\nNew Game\n");
     int size=2;
+    int turn=0;
     struct cards* hand=cardManager(size);
+    struct cards* dealerHand=cardManager(size);
 
-    printf("\nYour hand consists of:");
-    printCards(hand,size);
-
-    playerTurn(hand,&size);
-
+    dealerTurn(dealerHand,&size,&turn);
+    playerTurn(hand,&size,&turn);
+    turn++;
     free(hand);
 }
 
@@ -120,7 +121,7 @@ struct cards* cardManager(int hCount) {
   for(int i=0; i<52; i++){ // populating the deck
     deck[i]=i+1;
     aval[i]=1;
-//    handCard[i].aval[i]=1;
+//    handCard[i].aval[i]=aval[i];
 
 //    printf("Card %d, Card Value: %d\n",i+1,deck[i]);
   }
@@ -153,7 +154,7 @@ struct cards* cardManager(int hCount) {
         exit=1;
         if(aval[i]==1){
           aval[i]=0;
-//          handCard[i].aval[i]=0;
+          handCard[i].aval[i]=aval[i];
 //          printf("\nCard Avalible\n");
           loop=0;
           handCard[ii].rank=card[hand[ii]-1].rank;
@@ -186,6 +187,9 @@ void playerTurn(struct cards* hand, int* size){
   char term;
   int check=1;
 
+  printf("\nYour hand consists of:");
+  printCards(hand,*size);
+
   while(total<21){
     printf("\nYour hand value is: %d",total);
     printf("\nEnter 1 to hit\nEnter 2 to stand");
@@ -210,7 +214,7 @@ void playerTurn(struct cards* hand, int* size){
     free(newCard);
     total=handValue(hand,*size);
 
-    printf("\n\nprintng cards\n\n");
+//    printf("\n\nprintng cards\n\n");
     printCards(hand,*size);
     check=1;
     if(total>21){
@@ -232,6 +236,15 @@ void playerTurn(struct cards* hand, int* size){
     return;
   }
 }
+
+void dealerTurn(struct cards card[],int* count){
+  int total=handValue(card,*count);
+  printf("\nDealer Hand:");
+  printCards(card,*count);
+  printf("\nDealer Hand Value: %d",total);
+  printf("\n\n-----------------------------------------------\n");
+}
+
 int handValue(struct cards* hand,int size){
   int total=0;
   int ace=0;
@@ -285,7 +298,7 @@ int handValue(struct cards* hand,int size){
   return total;
 }
 void tutorial() {
-     printf("-----------------------------------------------\n");
+    printf("-----------------------------------------------\n");
     printf("                Rules/Tutorial                 \n");
     printf("-----------------------------------------------\n\n");
 
