@@ -9,26 +9,21 @@
 #include <string.h>
 
 struct cards{
-  char *rank;
-  char *suite;
+  const char *rank;
+  const char *suite;
   int count;
 };
 
-typedef struct Manager{ // Leilani's note: I don't remember at all how I'm supposed to
-                        // do this properly. Feel free to delete it if it's nonsense.
-}Manager;
 
 void mainMenu();
 void game();
 void tutorial();
-void cardManager();
+struct cards* cardManager(int hCount);
+void printCards(struct cards card[], int count);
+void playerTurn(struct cards* hand, int* size);
+int handValue(struct cards* hand, int size);
 
 int main(){
-int balance;
-  Manager DealerManager;
-  Manager TutorialManager;
-  Manager GameManager;
-  Manager BettingManager;
   printf("***********GAME START**********\n");
 
   mainMenu();
@@ -48,7 +43,7 @@ void mainMenu() {  // Alex's note: probably a much better way to do this,
     printf("2. Rules/Tutorial\n");
     printf("3. Exit Game\n");
     printf("Input: ");
-    while(loop=1){
+    while(loop==1){
         while(check==1) {
 //            printf("\nLoop\n");
             if(scanf("%d%c", &input, &term) != 2 || term != '\n') {  // Input buffer
@@ -73,7 +68,7 @@ void mainMenu() {  // Alex's note: probably a much better way to do this,
                 tutorial();
                 return;
             case 3:
-                printf("\nExiting Game...\n");
+                printf("\nExiting Game...\n"); // Can't exit after playing around, just automatically starts a new game.
                 loop=0;
                 return;
             default:
@@ -87,11 +82,28 @@ void mainMenu() {  // Alex's note: probably a much better way to do this,
 
 void game() {
     printf("\nNew Game\n");
-    cardManager();
-    return;
+    int size=2;
+    struct cards* hand=cardManager(size);
+
+    printf("\nYour hand consists of:");
+    printCards(hand,size);
+
+    playerTurn(hand,&size);
+
+    free(hand);
 }
 
-void cardManager() {
+void printCards(struct cards hand[], int size){
+  for(int i=0; i<size;i++){
+      printf("\n  %s of %s",hand[i].rank,hand[i].suite);
+  }
+}
+struct cards* cardManager(int hCount) {
+  struct cards *handCard = malloc(sizeof(struct cards) * hCount); // Memory Allocation
+  if (handCard == NULL) {
+      fprintf(stderr, "Memory allocation failed\n");
+      exit(EXIT_FAILURE);
+  }
   // Initializing Deck
   int deck[52];
   int aval[52];
@@ -116,13 +128,13 @@ void cardManager() {
   }
 
   // Dealing Cards
-  int hCount=5;
+//  int hCount=5;
   int hand[hCount];
-  int min=0;
+  int min=1;
   int max=52;
   int exit=0;
   int loop=0;
-  struct cards handCard[hCount];
+//  struct cards handCard[hCount];
   srand(time(NULL));
   for(int ii=0; ii<hCount; ii++){ // dealing ii amount of cards to hand
     int i=0;
@@ -153,11 +165,105 @@ void cardManager() {
       ii--;
     }
     else {
-          printf("\nCard: %d, Card Value: %d",ii+1,hand[ii]);
-          printf(", Card Rank: %s of %s\n",handCard[ii].rank,handCard[ii].suite);
+//          printf("\nCard: %d, Card Value: %d",ii+1,hand[ii]);
+//          printf(", Card Rank: %s of %s\n",handCard[ii].rank,handCard[ii].suite);
         }
   }
+  return handCard;
+}
 
+void playerTurn(struct cards* hand, int* size){
+  int total=handValue(hand, *size);
+  int action;
+  char term;
+  int check=1;
+
+  while(total<21){
+    printf("\nYour hand value is: %d",total);
+    printf("\nEnter 1 to hit\nEnter 2 to stand");
+    printf("\nInput: ");
+    while(check==1) {
+//            printf("\nLoop\n");
+        if(scanf("%d%c", &action, &term) != 2 || term != '\n') {  // Input buffer | Something breaks if you put an int above 2 idk y
+            printf("\nInvalid Input\n\nInput: ");
+            getchar();
+            check=1;
+        }
+        else {
+            check=0;
+        }
+    }
+  if(action==1){ // Probably needs to be a switch statement for more player actions
+    *size+=1;
+    hand=realloc(hand,sizeof(struct cards)*(*size));
+
+    struct cards* newCard=cardManager(1);
+    hand[*size-1]=newCard[0];
+    free(newCard);
+    total=handValue(hand,*size);
+
+    if(total>21){
+      printf("\nTotal is over 21;\nBust!\n\n");
+      mainMenu();
+    }
+  }
+  else if (action==2){
+    printf("\nYour final total is: %d\n\n",total);
+    mainMenu();
+  }
+  else {
+    printf("\nInvalid Input...");
+  }
+  }
+}
+int handValue(struct cards* hand,int size){
+  int total=0;
+  int ace=0;
+
+  for(int i=0;i<size;i++){
+    if(strcmp(hand[i].rank,"Jack")==0 || strcmp(hand[i].rank,"Queen")==0 || strcmp(hand[i].rank,"King")==0) {
+      total+=10;
+    }
+    else if(strcmp(hand[i].rank,"Ace")==0){
+      total+=11;
+      ace++;
+    }
+    else {
+      if((hand[i].rank,"Two")==0){
+        total+=2;
+      }
+      else if(strcmp(hand[i].rank,"Three")==0){
+        total+=3;
+      }
+      else if(strcmp(hand[i].rank,"Four")==0){
+        total+=4;
+      }
+      else if(strcmp(hand[i].rank,"Five")==0){
+        total+=5;
+      }
+      else if(strcmp(hand[i].rank,"Six")==0){
+        total+=6;
+      }
+      else if(strcmp(hand[i].rank,"Seven")==0){
+        total+=7;
+      }
+      else if(strcmp(hand[i].rank,"Eight")==0){
+        total+=8;
+      }
+      else if(strcmp(hand[i].rank,"Nine")==0){
+        total+=9;
+      }
+      else if(strcmp(hand[i].rank,"Ten")==0){
+        total+=10;
+      }
+    }
+//    printf("\nCurrent total: %d\n",total);
+  }
+  while (total>21&&ace>0){
+    total-=10;
+    ace--;
+  }
+  return total;
 }
 void tutorial() {
      printf("-----------------------------------------------\n");
@@ -203,11 +309,5 @@ void tutorial() {
     printf(" 5. Dealer reveals hidden card and plays\n");
     printf(" 6. Winner determined by the closest to 21 without busting wins\n\n");
 
-  
-    return;
+    mainMenu();
 }
-
-
-
-
-
