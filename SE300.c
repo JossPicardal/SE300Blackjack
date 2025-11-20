@@ -307,7 +307,8 @@ void tutorial() {
     printf(" 3. Dealer shows 1 card face up\n");
     printf(" 4. Choose your action: Hit, Hold, Double Down, or Split\n");
     printf(" 5. Dealer reveals hidden card and plays\n");
-    printf(" 6. Winner determined by the closest to 21 without busting wins\n\n");
+    printf(" 6. Winner determined by the closest to 21 without busting\n\n");
 
     mainMenu();
 }
+
