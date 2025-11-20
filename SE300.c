@@ -72,31 +72,32 @@ void mainMenu() {  // Alex's note: probably a much better way to do this,
             case 3:
                 printf("\nExiting Game...\n"); // Can't exit after playing around, just automatically starts a new game.
                 loop=0;
-                return;
+                exit(0);
             default:
                 printf("\nInvalid Input...\n\nPlease Re-Enter Input: ");
                 while((getchar())!='\n');
                 loop=1;
+                check=1;
                 break;
         }
     }
 }
 /*---------------------------------------------------Game Manager--------------------------------------------------------*/
 void game() {
-    printf("\nNew Game\n");
     int size=2;
     struct cards* hand=cardManager(size);
+    struct cards* dealerHand=cardManager(size);
 
-    printf("\nYour hand consists of:");
+    dealerTurn(dealerHand,&size);
+
+    printf("\nYour hand:");
     printCards(hand,size);
-
     playerTurn(hand,&size);
 
     free(hand);
 
-    dealerTurn(dealerHand,&size,&turn);
-    playerTurn(hand,&size,&turn);
-    turn++;
+//    dealerTurn(dealerHand,&size);
+    playerTurn(hand,&size);
     free(hand);
 }
 /*---------------------------------------------------Cards Section-------------------------------------------------------*/
@@ -221,8 +222,10 @@ void playerTurn(struct cards* hand, int* size){
   }
   else {
     printf("\nInvalid Input...");
+    check=1;
   }
   }
+}
 /*---------------------------------------------------DealerTurn----------------------------------------------------*/
 void dealerTurn(struct cards card[],int* count){
   int total=handValue(card,*count);
@@ -232,7 +235,7 @@ void dealerTurn(struct cards card[],int* count){
   printf("\n\n-----------------------------------------------\n");
 }
 //////////////////////////////////Hand Value Calculations////////////////////////////////////////////
-}
+
 int handValue(struct cards* hand,int size){
   int total=0;
   int ace=0;
@@ -273,6 +276,9 @@ int handValue(struct cards* hand,int size){
       else if(strcmp(hand[i].rank,"Ten")==0){
         total+=10;
       }
+      else {
+        total+=2;
+      }
     }
 //    printf("\nCurrent total: %d\n",total);
   }
@@ -283,36 +289,36 @@ int handValue(struct cards* hand,int size){
   return total;
 }
 /*---------------------------------------------------Betting Manager----------------------------------------------------------------*/
-void bettingManager() {
-    printf("\n----------- Betting -----------\n");
-    printf("Current Points: %d\n", playerPoints);
-    printf("Enter your initial bet: ");
-    
-    char term;
-    int check = 1;
-    
-    while(check == 1) {
-        if(scanf("%d%c", &currentBet, &term) != 2 || term != '\n') {
-            printf("\nInvalid Input\n\nEnter your bet: ");
-            while(getchar() != '\n');
-            check = 1;
-        }
-        else if(currentBet <= 0) {
-            printf("\nBet must be greater than 0\n\nEnter your bet: ");
-            check = 1;
-        }
-        else if(currentBet > playerPoints) {
-            printf("\nInsufficient points! You only have %d points.\n\nEnter your bet: ", playerPoints);
-            check = 1;
-        }
-        else {
-            check = 0;
-        }
-    }
-    
-    printf("\nYou bet %d points!\n", currentBet);
-    game();
-}
+//void bettingManager() {
+//    printf("\n----------- Betting -----------\n");
+//    printf("Current Points: %d\n", playerPoints);
+//    printf("Enter your initial bet: ");
+//
+//    char term;
+//    int check = 1;
+//
+//    while(check == 1) {
+//        if(scanf("%d%c", &currentBet, &term) != 2 || term != '\n') {
+//            printf("\nInvalid Input\n\nEnter your bet: ");
+//            while(getchar() != '\n');
+//            check = 1;
+//        }
+//        else if(currentBet <= 0) {
+//            printf("\nBet must be greater than 0\n\nEnter your bet: ");
+//            check = 1;
+//        }
+//        else if(currentBet > playerPoints) {
+//            printf("\nInsufficient points! You only have %d points.\n\nEnter your bet: ", playerPoints);
+//            check = 1;
+//        }
+//        else {
+//            check = 0;
+//        }
+//    }
+
+//    printf("\nYou bet %d points!\n", currentBet);
+//    game();
+//}
 
 /*---------------------------------------------------Tutorial Section-------------------------------------------------------*/
 void tutorial() {
