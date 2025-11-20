@@ -14,7 +14,7 @@ struct cards{
   int count;
 };
 
-
+/*---------------------------------------------------Main Menu-------------------------------------------------------*/
 void mainMenu();
 void game();
 void tutorial();
@@ -54,7 +54,7 @@ void mainMenu() {  // Alex's note: probably a much better way to do this,
             else {
                 check=0;
             }
-        }
+        }   
 //        printf("Exit Loop\n");
         switch(input) {
             case 1:
@@ -79,7 +79,7 @@ void mainMenu() {  // Alex's note: probably a much better way to do this,
         }
     }
 }
-
+/*---------------------------------------------------Game Start-------------------------------------------------------*/
 void game() {
     printf("\nNew Game\n");
     int size=2;
@@ -92,7 +92,7 @@ void game() {
 
     free(hand);
 }
-
+/*---------------------------------------------------Cards Section-------------------------------------------------------*/
 void printCards(struct cards hand[], int size){
   for(int i=0; i<size;i++){
       printf("\n  %s of %s",hand[i].rank,hand[i].suite);
@@ -126,7 +126,7 @@ struct cards* cardManager(int hCount) {
       dCount++;
     }
   }
-
+/*---------------------------------------------------Dealer-------------------------------------------------------*/
   // Dealing Cards
 //  int hCount=5;
   int hand[hCount];
@@ -265,6 +265,11 @@ int handValue(struct cards* hand,int size){
   }
   return total;
 }
+/*---------------------------------------------------Betting----------------------------------------------------------------*/
+void betting () {
+  
+}
+/*---------------------------------------------------Tutorial Section-------------------------------------------------------*/
 void tutorial() {
      printf("-----------------------------------------------\n");
     printf("                Rules/Tutorial                 \n");
@@ -307,8 +312,7 @@ void tutorial() {
     printf(" 3. Dealer shows 1 card face up\n");
     printf(" 4. Choose your action: Hit, Hold, Double Down, or Split\n");
     printf(" 5. Dealer reveals hidden card and plays\n");
-    printf(" 6. Winner determined by the closest to 21 without busting\n\n");
+    printf(" 6. Winner determined by the closest to 21 without busting wins\n\n");
 
     mainMenu();
 }
-
