@@ -12,9 +12,11 @@ struct cards{
   const char *rank;
   const char *suite;
   int count;
+  int aval[52];
 };
 
-/*---------------------------------------------------Main Menu-------------------------------------------------------*/
+
+
 void mainMenu();
 void game();
 void tutorial();
@@ -53,8 +55,9 @@ void mainMenu() {  // Alex's note: probably a much better way to do this,
             }
             else {
                 check=0;
+//                printf("\n\n%d",input);
             }
-        }   
+        }
 //        printf("Exit Loop\n");
         switch(input) {
             case 1:
@@ -70,18 +73,19 @@ void mainMenu() {  // Alex's note: probably a much better way to do this,
             case 3:
                 printf("\nExiting Game...\n"); // Can't exit after playing around, just automatically starts a new game.
                 loop=0;
-                return;
+                exit(0);
             default:
                 printf("\nInvalid Input...\n\nPlease Re-Enter Input: ");
-                while((getchar())!='\n');
+                //while((getchar())!='\n');
                 loop=1;
+                check=1;
                 break;
         }
     }
 }
-/*---------------------------------------------------Game Start-------------------------------------------------------*/
+
 void game() {
-    printf("\nNew Game\n");
+//    printf("\nNew Game\n");
     int size=2;
     struct cards* hand=cardManager(size);
 
@@ -92,12 +96,14 @@ void game() {
 
     free(hand);
 }
-/*---------------------------------------------------Cards Section-------------------------------------------------------*/
+
 void printCards(struct cards hand[], int size){
   for(int i=0; i<size;i++){
       printf("\n  %s of %s",hand[i].rank,hand[i].suite);
   }
+  printf("\n");
 }
+
 struct cards* cardManager(int hCount) {
   struct cards *handCard = malloc(sizeof(struct cards) * hCount); // Memory Allocation
   if (handCard == NULL) {
@@ -114,6 +120,7 @@ struct cards* cardManager(int hCount) {
   for(int i=0; i<52; i++){ // populating the deck
     deck[i]=i+1;
     aval[i]=1;
+//    handCard[i].aval[i]=1;
 
 //    printf("Card %d, Card Value: %d\n",i+1,deck[i]);
   }
@@ -126,7 +133,7 @@ struct cards* cardManager(int hCount) {
       dCount++;
     }
   }
-/*---------------------------------------------------Dealer-------------------------------------------------------*/
+
   // Dealing Cards
 //  int hCount=5;
   int hand[hCount];
@@ -146,6 +153,7 @@ struct cards* cardManager(int hCount) {
         exit=1;
         if(aval[i]==1){
           aval[i]=0;
+//          handCard[i].aval[i]=0;
 //          printf("\nCard Avalible\n");
           loop=0;
           handCard[ii].rank=card[hand[ii]-1].rank;
@@ -202,6 +210,9 @@ void playerTurn(struct cards* hand, int* size){
     free(newCard);
     total=handValue(hand,*size);
 
+    printf("\n\nprintng cards\n\n");
+    printCards(hand,*size);
+    check=1;
     if(total>21){
       printf("\nTotal is over 21;\nBust!\n\n");
       mainMenu();
@@ -212,8 +223,13 @@ void playerTurn(struct cards* hand, int* size){
     mainMenu();
   }
   else {
-    printf("\nInvalid Input...");
+    printf("\nInvalid Input...\n");
+    check=1;
   }
+  }
+  if(total==21){
+    printf("\nBlackJack!");
+    return;
   }
 }
 int handValue(struct cards* hand,int size){
@@ -256,6 +272,9 @@ int handValue(struct cards* hand,int size){
       else if(strcmp(hand[i].rank,"Ten")==0){
         total+=10;
       }
+      else {
+        total+=2;
+      }
     }
 //    printf("\nCurrent total: %d\n",total);
   }
@@ -265,11 +284,6 @@ int handValue(struct cards* hand,int size){
   }
   return total;
 }
-/*---------------------------------------------------Betting----------------------------------------------------------------*/
-void betting () {
-  
-}
-/*---------------------------------------------------Tutorial Section-------------------------------------------------------*/
 void tutorial() {
      printf("-----------------------------------------------\n");
     printf("                Rules/Tutorial                 \n");
