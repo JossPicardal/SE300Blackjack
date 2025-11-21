@@ -154,6 +154,9 @@ void game() {
       int dealerStanding = 0;
       int playerBusted = 0;
       int dealerBusted = 0;
+      int playerInitialBet;
+      int playerAction;
+      int repeat=1;
       while(!playerStanding || !dealerStanding) {
         // Player's turn (if not standing and not busted)
         if(!playerStanding && !playerBusted) {
@@ -162,22 +165,37 @@ void game() {
           printf("              YOUR TURN                        \n");
           printf("-----------------------------------------------\n");
 
-          int playerAction = playerTurn(&playerHand, &playerSize);
+          while(repeat==1) {
+            playerAction = playerTurn(&playerHand, &playerSize);
 
-          if(playerAction == 0) { // Player busted
-            playerBusted = 1;
-            playerStanding = 1;
-            dealerStanding = 1; // End game if player busts
-            break;
-          } else if(playerAction == 2) { // Player stands
-            playerStanding = 1;
-          }
-          else if(playerAction==3){
-            playerStanding=1;
-            playerBet=doubleDown(playerBet);
+            if(playerAction == 0) { // Player busted
+              playerBusted = 1;
+              playerStanding = 1;
+              dealerStanding = 1; // End game if player busts
+              repeat=0;
+              break;
+            }
+            else if(playerAction==1){
+              playerStanding=0;
+              repeat=1;
+            }
+            else if(playerAction == 2) { // Player stands
+              playerStanding = 1;
+              repeat=0;
+            }
+            else if(playerAction==3){
+              playerStanding=1;
+              playerInitialBet=playerBet.bet;
+              playerBet=doubleDown(playerBet);
+              if(playerInitialBet==playerBet.bet){
+                repeat=1;
+              }
+              else{
+                repeat=0;
+              }
 
+            }
           }
-          // playerAction == 1 means player hit and continues
         }
 
         // Dealer's turn (if not standing and not busted)
@@ -324,7 +342,7 @@ int playerTurn(struct cards** hand, int* size){
     printf("\nYou drew: %s of %s",(*hand)[*size-1].rank,(*hand)[*size-1].suite);
 
     total=handValue(*hand,*size);
-    printf("\nYour new hand value: %d",total);
+    printf("\nYour new hand value: %d\n",total);
 
     if(total>21){
       printf("\n\nYour hand:");
@@ -340,7 +358,7 @@ int playerTurn(struct cards** hand, int* size){
     return 1; // Hit successfully
   }
   else if (action==2){ // Stand
-    printf("\nYou stand with a total of: %d",total);
+    printf("\nYou stand with a total of: %d\n",total);
     return 2; // Standing
   }
   else if(action==3){
@@ -358,7 +376,7 @@ int playerTurn(struct cards** hand, int* size){
     printf("\nYou drew: %s of %s",(*hand)[*size-1].rank,(*hand)[*size-1].suite);
 
     total=handValue(*hand,*size);
-    printf("\nYour new hand value: %d",total);
+    printf("\nYour new hand value: %d\n",total);
     return 3;
   }
   return 2; // Default to standing
@@ -410,7 +428,7 @@ int determineWinner(int playerTotal, int dealerTotal){
   delay(500);
   printf("\n-----------------------------------------------\n");
   printf("                  RESULTS                      \n");
-  printf("-----------------------------------------------\n");
+  printf("-----------------------------------------------\n\n");
   printf("Your total: %d\n",playerTotal);
   printf("Dealer's total: %d\n",dealerTotal);
 
@@ -505,6 +523,7 @@ struct bets bettingManager(int initial) {
       }
       else {
         check=0;
+        printf("\n");
         return bet;
       }
     }
@@ -542,6 +561,10 @@ struct bets betting(struct bets betIn){
   return betIn;
 }
 struct bets doubleDown(struct bets betIn){
+  if (betIn.bet*2>betIn.balance){
+    printf("\nCan't increase bet\nYour bet is still %d\n",betIn.bet);
+    return betIn;
+  }
   betIn.balance-=betIn.bet;
   betIn.bet+=betIn.bet;
   printf("\nYou double down and change your bet to %d\n",betIn.bet);
