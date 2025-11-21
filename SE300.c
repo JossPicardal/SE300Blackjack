@@ -44,13 +44,13 @@ int main(){
 void initializeDeck() {
     const char *suites[] = {"Spades", "Hearts", "Clubs", "Diamonds"};
     const char *ranks[] = {"Ace", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Queen", "King"};
-    
+
     int dCount = 0;
     for(int i = 0; i < 52; i++) {
         globalDeck[i] = i + 1;
         globalAvail[i] = 1; // Mark all cards as available
     }
-    
+
     for(int j = 0; j < 4; j++) {
         for(int jj = 0; jj < 13; jj++) {
             globalCards[dCount].count = jj + 1;
@@ -59,7 +59,7 @@ void initializeDeck() {
             dCount++;
         }
     }
-    
+
     deckInitialized = 1;
 }
 
@@ -115,14 +115,14 @@ void game() {
     printf("\n-----------------------------------------------\n");
     printf("              NEW GAME STARTING                \n");
     printf("-----------------------------------------------\n");
-    
+
     // Reset deck for new game
     initializeDeck();
-    
+
     int playerSize=2;
     int dealerSize=2;
     int playerDone=0;
-    
+
     // Deal initial cards to player and dealer from shared deck
     struct cards* playerHand=cardManager(playerSize);
     struct cards* dealerHand=cardManager(dealerSize);
@@ -138,28 +138,28 @@ void game() {
     // If player didn't bust, dealer plays
     if(playerDone==1){
         int playerTotal=handValue(playerHand,playerSize);
-        
+
         printf("\n-----------------------------------------------\n");
         printf("              DEALER'S TURN                    \n");
         printf("-----------------------------------------------\n");
-        
+
         // Reveal dealer's full hand
         printf("\nDealer's full hand:");
         printCards(dealerHand,dealerSize);
         printf("\nDealer's hand value: %d\n",handValue(dealerHand,dealerSize));
-        
+
         // Dealer draws cards
         dealerTurn(&dealerHand,&dealerSize);
-        
+
         int dealerTotal=handValue(dealerHand,dealerSize);
-        
+
         // Determine winner
         determineWinner(playerTotal,dealerTotal);
     }
-    
+
     free(playerHand);
     free(dealerHand);
-    
+
     printf("\n");
     mainMenu();
 }
@@ -176,17 +176,17 @@ struct cards* cardManager(int hCount) {
         fprintf(stderr, "Memory allocation failed\n");
         exit(EXIT_FAILURE);
     }
-    
+
     // Make sure deck is initialized
     if (!deckInitialized) {
         initializeDeck();
     }
-    
+
     // Deal cards from the shared deck
     for(int ii = 0; ii < hCount; ii++) {
         int cardIndex;
         int found = 0;
-        
+
         // Keep trying until we find an available card
         while(!found) {
             cardIndex = rand() % 52;
@@ -199,7 +199,7 @@ struct cards* cardManager(int hCount) {
             }
         }
     }
-    
+
     return handCard;
 }
 
@@ -228,13 +228,17 @@ void playerTurn(struct cards* hand, int* size, int* playerDone){
   if(action==1){
     *size+=1;
     hand=realloc(hand,sizeof(struct cards)*(*size));
+    if(hand==NULL){
+      fprintf(stderr,"\nMemory Allocation failed");
+      exit(EXIT_FAILURE);
+    }
 
     struct cards* newCard=cardManager(1);
     hand[*size-1]=newCard[0];
     free(newCard);
-    
+
     printf("\nYou drew: %s of %s",hand[*size-1].rank,hand[*size-1].suite);
-    
+
     total=handValue(hand,*size);
 
     if(total>21){
@@ -243,7 +247,7 @@ void playerTurn(struct cards* hand, int* size, int* playerDone){
       printf("\n\nTotal is over 21: %d",total);
       printf("\nBust! You lose!\n");
       *playerDone=0;
-      return;
+      mainMenu();
     }
   }
   else if (action==2){
@@ -255,7 +259,7 @@ void playerTurn(struct cards* hand, int* size, int* playerDone){
     printf("\nInvalid Input...");
   }
   }
-  
+
   // If we exit the loop with exactly 21
   if(total==21){
     printf("\n\nYou have 21!");
@@ -265,27 +269,31 @@ void playerTurn(struct cards* hand, int* size, int* playerDone){
 /*---------------------------------------------------DealerTurn----------------------------------------------------*/
 void dealerTurn(struct cards** hand, int* size){
   int total=handValue(*hand,*size);
-  
+
   // Dealer must hit on 16 or less, stand on 17 or more
   while(total<17){
     printf("\nDealer hits...");
     *size+=1;
     *hand=realloc(*hand,sizeof(struct cards)*(*size));
-    
+    if(hand==NULL){
+      fprintf(stderr,"\nMemory Allocation failed");
+      exit(EXIT_FAILURE);
+    }
+
     struct cards* newCard=cardManager(1);
     (*hand)[*size-1]=newCard[0];
     free(newCard);
-    
+
     printf("\nDealer drew: %s of %s",(*hand)[*size-1].rank,(*hand)[*size-1].suite);
-    
+
     total=handValue(*hand,*size);
     printf("\nDealer's hand value: %d",total);
   }
-  
+
   printf("\n\nDealer's final hand:");
   printCards(*hand,*size);
   printf("\nDealer's final total: %d\n",total);
-  
+
   if(total>21){
     printf("\nDealer busts!\n");
   }
@@ -300,7 +308,7 @@ void determineWinner(int playerTotal, int dealerTotal){
   printf("-----------------------------------------------\n");
   printf("Your total: %d\n",playerTotal);
   printf("Dealer's total: %d\n",dealerTotal);
-  
+
   if(dealerTotal>21){
     printf("\nDealer busts! You win!\n");
   }
@@ -367,14 +375,14 @@ int handValue(struct cards* hand,int size){
 void bettingManager() {
     int playerPoints=1000;
     int currentBet=0;
-    
+
     printf("\n----------- Betting -----------\n");
     printf("Current Points: %d\n", playerPoints);
     printf("Enter your initial bet: ");
-    
+
     char term;
     int check = 1;
-    
+
     while(check == 1) {
         if(scanf("%d%c", &currentBet, &term) != 2 || term != '\n') {
             printf("\nInvalid Input\n\nEnter your bet: ");
@@ -393,7 +401,7 @@ void bettingManager() {
             check = 0;
         }
     }
-    
+
     printf("\nYou bet %d points!\n", currentBet);
     game();
 }
@@ -405,7 +413,7 @@ void tutorial() {
     printf("-----------------------------------------------\n\n");
 
     printf("Objective: Beat the dealer by having your hands total value closer to 21 without busting (going over 21)\n\n");
-    
+
     printf("Terminology: \n");
     printf(" Hit         - Get another card from dealer\n");
     printf(" Bust        - Card amount is greater than 21\n");
@@ -415,12 +423,12 @@ void tutorial() {
     printf(" Split       - Split current hand into 2 hands; an equal bet to the starting bet must be on each hand\n");
     printf(" Hand        - Current set of cards a player has \n");
     printf(" Dealer      - Computer opponent that deals cards\n\n");
-    
+
     printf("Card Values: \n");
     printf(" Number Cards (2-10) = Face value: \n");
     printf(" Face Cards (J, Q, K) = 10 \n");
     printf(" Ace (A) = 11 or 1 when hand total would be higher than 21 \n\n");
-    
+
     printf("Betting Rules: \n");
 
     printf("American Blackjack Rules: \n");
