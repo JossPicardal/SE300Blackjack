@@ -14,6 +14,11 @@ struct cards{
   int count;
 };
 
+struct bets{
+  int balance;
+  int bet;
+};
+
 // Global deck state
 int globalDeck[52];
 int globalAvail[52];
@@ -23,7 +28,7 @@ int deckInitialized = 0;
 void mainMenu();
 void game();
 void tutorial();
-void bettingManager();
+struct bets* bettingManager(int initial);
 void initializeDeck();
 struct cards* cardManager(int hCount);
 void printCards(struct cards card[], int count);
@@ -122,7 +127,14 @@ void game() {
     int playerSize=2;
     int dealerSize=2;
     int playerDone=0;
+    int initialBet=1;
+    int gameOver=0;
 
+    struct bets* playerBet=bettingManager(initialBet);
+    initialBet=0;
+    while(gameOver==0){
+      struct bets* playerBet=bettingManager(initialBet);
+//    printf("\nPlayerBet: %d",playerBet->bet);
     // Deal initial cards to player and dealer from shared deck
     struct cards* playerHand=cardManager(playerSize);
     struct cards* dealerHand=cardManager(dealerSize);
@@ -161,6 +173,13 @@ void game() {
     free(dealerHand);
 
     printf("\n");
+    if(playerBet->balance<0){
+      gameOver=1;
+    }
+    else{
+      gameOver=0;
+    }
+  }
     mainMenu();
 }
 /*---------------------------------------------------Cards Section-------------------------------------------------------*/
@@ -373,38 +392,61 @@ int handValue(struct cards* hand,int size){
   return total;
 }
 /*---------------------------------------------------Betting Manager----------------------------------------------------------------*/
-void bettingManager() { // Requirement FL5: The product shall include a point system for betting
-    int playerPoints=1000;
-    int currentBet=0;
+struct bets* bettingManager(int initial) {
+  char term;
+  int check = 1;
+  struct bets *bet=malloc(sizeof(struct bets));
+  if(bet==NULL){
+    printf("runtimefailure");
+    exit(EXIT_FAILURE);
+  }
+  if (initial==1){
+    printf("\n----------- Betting Initialization -----------\n");
+    printf("Please enter your total balance: ");
+    while(check==1){
+      if(scanf("%d%c",&bet->balance,&term)!=2||term!='\n'){
+        printf("\nInvalid Input\n\nEnter total balance: ");
+        check=1;
+      }
+      else if(bet->balance<=0){
+        printf("\nBalance must be above 0\n\nEnter total Balance: ");
+        check=1;
+      }
+      else {
+        check=0;
+        return bet;
+      }
+    }
+  }
 
+  check=1;
     printf("\n----------- Betting -----------\n");
-    printf("Current Points: %d\n", playerPoints);
+    printf("Current Points: %d\n", bet->balance);
     printf("Enter your initial bet: ");
 
-    char term;
-    int check = 1;
-
     while(check == 1) {
-        if(scanf("%d%c", &currentBet, &term) != 2 || term != '\n') {
+        if(scanf("%d%c", &bet->bet, &term) != 2 || term != '\n') {
             printf("\nInvalid Input\n\nEnter your bet: ");
             while(getchar() != '\n');
             check = 1;
         }
-        else if(currentBet <= 0) { // Requirement FR4: The system should include input validation for bets and choices. There should be a min of 1 point and a max of 1000 points
-            printf("\nBet must be greater than 0\n\nEnter your bet: "); 
+        else if(bet->bet <= 0) {
+            printf("\nBet must be greater than 0\n\nEnter your bet: ");
             check = 1;
         }
-        else if(currentBet > playerPoints) {
-            printf("\nInsufficient points! You only have %d points.\n\nEnter your bet: ", playerPoints);
+        else if(bet->bet > bet->balance) {
+            printf("\nInsufficient points! You only have %d points.\n\nEnter your bet: ", bet->bet);
             check = 1;
         }
         else {
             check = 0;
+            bet->balance=bet->balance-bet->bet;
         }
     }
 
-    printf("\nYou bet %d points!\n", currentBet);
-    game();
+    printf("\nYou bet %d points!\n", bet->bet);
+    printf("\nYou have %d points remaining\n",bet->balance);
+    return bet;
 }
 
 /*---------------------------------------------------Tutorial Section-------------------------------------------------------*/
@@ -454,3 +496,4 @@ void tutorial() { // Requirement FL2: The product shall include a Tutorial to te
 
     mainMenu();
 }
+
