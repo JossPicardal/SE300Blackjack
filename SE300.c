@@ -14,11 +14,17 @@ struct cards{
   int count;
 };
 
+// Global deck state
+int globalDeck[52];
+int globalAvail[52];
+struct cards globalCards[52];
+int deckInitialized = 0;
 
 void mainMenu();
 void game();
 void tutorial();
 void bettingManager();
+void initializeDeck();
 struct cards* cardManager(int hCount);
 void printCards(struct cards card[], int count);
 void playerTurn(struct cards* hand, int* size, int* playerDone);
@@ -28,11 +34,35 @@ void determineWinner(int playerTotal, int dealerTotal);
 
 int main(){
   printf("***********GAME START**********\n");
-
+  srand(time(NULL)); // Initialize random seed once at start
   mainMenu();
 
   return 0;
 }
+
+/*---------------------------------------------------Deck Initialization-------------------------------------------------------*/
+void initializeDeck() {
+    const char *suites[] = {"Spades", "Hearts", "Clubs", "Diamonds"};
+    const char *ranks[] = {"Ace", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Queen", "King"};
+    
+    int dCount = 0;
+    for(int i = 0; i < 52; i++) {
+        globalDeck[i] = i + 1;
+        globalAvail[i] = 1; // Mark all cards as available
+    }
+    
+    for(int j = 0; j < 4; j++) {
+        for(int jj = 0; jj < 13; jj++) {
+            globalCards[dCount].count = jj + 1;
+            globalCards[dCount].rank = ranks[jj];
+            globalCards[dCount].suite = suites[j];
+            dCount++;
+        }
+    }
+    
+    deckInitialized = 1;
+}
+
 /*---------------------------------------------------Main Menu-------------------------------------------------------*/
 void mainMenu() {  // Alex's note: probably a much better way to do this,
     int input;     // just wanted to get a start on how we could do it.
@@ -48,7 +78,6 @@ void mainMenu() {  // Alex's note: probably a much better way to do this,
     printf("Input: ");
     while(loop==1){
         while(check==1) {
-//            printf("\nLoop\n");
             if(scanf("%d%c", &input, &term) != 2 || term != '\n') {  // Input buffer
                 printf("\nInvalid Input\n\nInput: ");
                 getchar();
@@ -58,7 +87,6 @@ void mainMenu() {  // Alex's note: probably a much better way to do this,
                 check=0;
             }
         }
-//        printf("Exit Loop\n");
         switch(input) {
             case 1:
                 printf("\nStarting New Game...\n");
@@ -71,7 +99,7 @@ void mainMenu() {  // Alex's note: probably a much better way to do this,
                 tutorial();
                 return;
             case 3:
-                printf("\nExiting Game...\n"); // Can't exit after playing around, just automatically starts a new game.
+                printf("\nExiting Game...\n");
                 loop=0;
                 return;
             default:
@@ -88,11 +116,14 @@ void game() {
     printf("              NEW GAME STARTING                \n");
     printf("-----------------------------------------------\n");
     
+    // Reset deck for new game
+    initializeDeck();
+    
     int playerSize=2;
     int dealerSize=2;
     int playerDone=0;
     
-    // Deal initial cards to player and dealer
+    // Deal initial cards to player and dealer from shared deck
     struct cards* playerHand=cardManager(playerSize);
     struct cards* dealerHand=cardManager(dealerSize);
 
@@ -138,80 +169,40 @@ void printCards(struct cards hand[], int size){
       printf("\n  %s of %s",hand[i].rank,hand[i].suite);
   }
 }
-struct cards* cardManager(int hCount) {
-  struct cards *handCard = malloc(sizeof(struct cards) * hCount); // Memory Allocation
-  if (handCard == NULL) {
-      fprintf(stderr, "Memory allocation failed\n");
-      exit(EXIT_FAILURE);
-  }
-  // Initializing Deck
-  int deck[52];
-  int aval[52];
-  int dCount=0;
-  const char *suites[]={"Spades","Hearts","Clubs","Diamonds"};
-  const char *ranks[]={"Ace","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Jack","Queen","King"};
-  struct cards card[52];
-  for(int i=0; i<52; i++){ // populating the deck
-    deck[i]=i+1;
-    aval[i]=1;
 
-//    printf("Card %d, Card Value: %d\n",i+1,deck[i]);
-  }
-  for(int j=0;j<4;j++){ // assigning rank and suit to cards
-    for(int jj=0;jj<13;jj++){
-      card[dCount].count=jj+1;
-      card[dCount].rank=ranks[jj];
-      card[dCount].suite=suites[j];
-      //printf("\nCard: %d; %s of %s",dCount+1,card[dCount].rank,card[dCount].suite);
-      dCount++;
+struct cards* cardManager(int hCount) {
+    struct cards *handCard = malloc(sizeof(struct cards) * hCount);
+    if (handCard == NULL) {
+        fprintf(stderr, "Memory allocation failed\n");
+        exit(EXIT_FAILURE);
     }
-  }
-/*---------------------------------------------------Dealer-------------------------------------------------------*/
-  // Dealing Cards
-//  int hCount=5;
-  int hand[hCount];
-  int min=1;
-  int max=52;
-  int exit=0;
-  int loop=0;
-//  struct cards handCard[hCount];
-///////////////////////////////////////////Card Dealing//////////////////////////////////////
-  srand(time(NULL));
-  for(int ii=0; ii<hCount; ii++){ // dealing ii amount of cards to hand
-    int i=0;
-    exit=0;
-    hand[ii]=rand()%(max-min+1)+min;
-    while(exit!=1){
-      if(hand[ii]==deck[i]){
-//        printf("\nCard found\n");
-        exit=1;
-        if(aval[i]==1){
-          aval[i]=0;
-//          printf("\nCard Avalible\n");
-          loop=0;
-          handCard[ii].rank=card[hand[ii]-1].rank;
-          handCard[ii].suite=card[hand[ii]-1].suite;
-        }
-        else if(aval[i]==0){
-//          printf("\nCard Unavalible\n");
-          loop=1;
-        }
-      }
-      else{
-//        printf("\nCard not found %d\n",i);
-        i++;
-      }
+    
+    // Make sure deck is initialized
+    if (!deckInitialized) {
+        initializeDeck();
     }
-    if(loop==1){
-      ii--;
-    }
-    else {
-//          printf("\nCard: %d, Card Value: %d",ii+1,hand[ii]);
-//          printf(", Card Rank: %s of %s\n",handCard[ii].rank,handCard[ii].suite);
+    
+    // Deal cards from the shared deck
+    for(int ii = 0; ii < hCount; ii++) {
+        int cardIndex;
+        int found = 0;
+        
+        // Keep trying until we find an available card
+        while(!found) {
+            cardIndex = rand() % 52;
+            if(globalAvail[cardIndex] == 1) {
+                globalAvail[cardIndex] = 0; // Mark card as used
+                handCard[ii].rank = globalCards[cardIndex].rank;
+                handCard[ii].suite = globalCards[cardIndex].suite;
+                handCard[ii].count = globalCards[cardIndex].count;
+                found = 1;
+            }
         }
-  }
-  return handCard;
+    }
+    
+    return handCard;
 }
+
 /*-----------------------------------------------------------------Player Turn--------------------------------------------*/
 void playerTurn(struct cards* hand, int* size, int* playerDone){
   int total=handValue(hand, *size);
@@ -225,8 +216,7 @@ void playerTurn(struct cards* hand, int* size, int* playerDone){
     printf("\nInput: ");
     check=1;
     while(check==1) {
-//            printf("\nLoop\n");
-        if(scanf("%d%c", &action, &term) != 2 || term != '\n') {  // Input buffer | Something breaks if you put an int above 2 idk y
+        if(scanf("%d%c", &action, &term) != 2 || term != '\n') {
             printf("\nInvalid Input\n\nInput: ");
             getchar();
             check=1;
@@ -235,7 +225,7 @@ void playerTurn(struct cards* hand, int* size, int* playerDone){
             check=0;
         }
     }
-  if(action==1){ // Probably needs to be a switch statement for more player actions
+  if(action==1){
     *size+=1;
     hand=realloc(hand,sizeof(struct cards)*(*size));
 
@@ -366,7 +356,6 @@ int handValue(struct cards* hand,int size){
         total+=10;
       }
     }
-//    printf("\nCurrent total: %d\n",total);
   }
   while (total>21&&ace>0){
     total-=10;
@@ -416,7 +405,7 @@ void tutorial() {
     printf("-----------------------------------------------\n\n");
 
     printf("Objective: Beat the dealer by having your hands total value closer to 21 without busting (going over 21)\n\n");
-
+    
     printf("Terminology: \n");
     printf(" Hit         - Get another card from dealer\n");
     printf(" Bust        - Card amount is greater than 21\n");
@@ -426,12 +415,12 @@ void tutorial() {
     printf(" Split       - Split current hand into 2 hands; an equal bet to the starting bet must be on each hand\n");
     printf(" Hand        - Current set of cards a player has \n");
     printf(" Dealer      - Computer opponent that deals cards\n\n");
-
+    
     printf("Card Values: \n");
     printf(" Number Cards (2-10) = Face value: \n");
     printf(" Face Cards (J, Q, K) = 10 \n");
     printf(" Ace (A) = 11 or 1 when hand total would be higher than 21 \n\n");
-
+    
     printf("Betting Rules: \n");
 
     printf("American Blackjack Rules: \n");
