@@ -64,15 +64,15 @@ void initializeDeck() {
 }
 
 /*---------------------------------------------------Main Menu-------------------------------------------------------*/
-void mainMenu() {  // Alex's note: probably a much better way to do this,
-    int input;     // just wanted to get a start on how we could do it.
+void mainMenu() {  // Requirement FL1: The product shall include a Menu
+    int input;
     int loop=1;
     int check=1;
     char term;
     printf("-----------------------------------------------\n");
     printf("            Welcome to Blackjack                \n");
     printf("-----------------------------------------------\n\n");
-    printf("1. Start New Game\n");
+    printf("1. Start New Game\n"); // Requirement FR1: The system should provide a menu with at least three options (Play, How to Play, Exit)
     printf("2. Rules/Tutorial\n");
     printf("3. Exit Game\n");
     printf("Input: ");
@@ -212,8 +212,8 @@ void playerTurn(struct cards* hand, int* size, int* playerDone){
 
   while(total<21){
     printf("\n\nYour hand value is: %d",total);
-    printf("\nEnter 1 to hit\nEnter 2 to stand");
-    printf("\nInput: ");
+    printf("\nEnter 1 to hit\nEnter 2 to stand"); // Requirement FL3: The product shall include a UI to allow the play to hit, hold, split
+    printf("\nInput: "); // Requirement FR3: The system should allow user actions (Hit, Hold, Double Down, Split)
     check=1;
     while(check==1) {
         if(scanf("%d%c", &action, &term) != 2 || term != '\n') {
@@ -243,7 +243,7 @@ void playerTurn(struct cards* hand, int* size, int* playerDone){
 
     if(total>21){
       printf("\n\nYour hand:");
-      printCards(hand,*size);
+      printCards(hand,*size); // Requirement FR7: The system should track and display point totals after every hand
       printf("\n\nTotal is over 21: %d",total);
       printf("\nBust! You lose!\n");
       *playerDone=0;
@@ -267,6 +267,7 @@ void playerTurn(struct cards* hand, int* size, int* playerDone){
   }
 }
 /*---------------------------------------------------DealerTurn----------------------------------------------------*/
+// Requirement FR6: The system should simulate dealer actions per the rules we set
 void dealerTurn(struct cards** hand, int* size){
   int total=handValue(*hand,*size);
 
@@ -310,7 +311,7 @@ void determineWinner(int playerTotal, int dealerTotal){
   printf("Dealer's total: %d\n",dealerTotal);
 
   if(dealerTotal>21){
-    printf("\nDealer busts! You win!\n");
+    printf("\nDealer busts! You win!\n"); // Requirement FR5: The system should declare outcomes (Bust, Blackjack, Win, Loss, Tie)
   }
   else if(playerTotal>dealerTotal){
     printf("\nYou win!\n");
@@ -372,7 +373,7 @@ int handValue(struct cards* hand,int size){
   return total;
 }
 /*---------------------------------------------------Betting Manager----------------------------------------------------------------*/
-void bettingManager() {
+void bettingManager() { // Requirement FL5: The product shall include a point system for betting
     int playerPoints=1000;
     int currentBet=0;
 
@@ -389,8 +390,8 @@ void bettingManager() {
             while(getchar() != '\n');
             check = 1;
         }
-        else if(currentBet <= 0) {
-            printf("\nBet must be greater than 0\n\nEnter your bet: ");
+        else if(currentBet <= 0) { // Requirement FR4: The system should include input validation for bets and choices. There should be a min of 1 point and a max of 1000 points
+            printf("\nBet must be greater than 0\n\nEnter your bet: "); 
             check = 1;
         }
         else if(currentBet > playerPoints) {
@@ -407,7 +408,7 @@ void bettingManager() {
 }
 
 /*---------------------------------------------------Tutorial Section-------------------------------------------------------*/
-void tutorial() {
+void tutorial() { // Requirement FL2: The product shall include a Tutorial to teach the player how to play
      printf("-----------------------------------------------\n");
     printf("                Rules/Tutorial                 \n");
     printf("-----------------------------------------------\n\n");
@@ -431,7 +432,7 @@ void tutorial() {
 
     printf("Betting Rules: \n");
 
-    printf("American Blackjack Rules: \n");
+    printf("American Blackjack Rules: \n"); // Requirement FL4: The product shall follow American blackjack rules
     printf("- American Blackjack payouts for Blackjack are 3:2 or 6:5\n");
     printf("- The hole card allows the dealer to peek for Blackjack on Ace up-cards and 10s\n");
     printf("- The dealer must hold on a soft 17\n");
