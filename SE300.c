@@ -561,7 +561,7 @@ struct bets betting(struct bets betIn){
   return betIn;
 }
 struct bets doubleDown(struct bets betIn){
-  if (betIn.bet*2>betIn.balance){
+  if (betIn.bet>betIn.balance){
     printf("\nCan't increase bet\nYour bet is still %d\n",betIn.bet);
     return betIn;
   }
@@ -630,3 +630,4 @@ void delay(int mili) {
   int delay=mili;
   while(clock()<start+delay);
 }
+
