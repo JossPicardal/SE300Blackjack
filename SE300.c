@@ -10,7 +10,7 @@
 
 struct cards{
   const char *rank;
-  const char *suite;
+  const char *suit;
   int count;
 };
 
@@ -31,13 +31,14 @@ void tutorial();
 struct bets bettingManager(int initial);
 struct bets betting(struct bets betIn);
 struct bets doubleDown(struct bets betIn);
+
 void initializeDeck();
 struct cards* cardManager(int hCount);
 void printCards(struct cards card[], int count);
 int playerTurn(struct cards** hand, int* size);
 int handValue(struct cards* hand, int size);
 int dealerTurn(struct cards** hand, int* size);
-int determineWinner(int playerTotal, int dealerTotal);
+int determineWinner(int playerTotal, int playerSecondTotal, int dealerTotal);
 int payOut(struct bets bet);
 void delay(int mili);
 
@@ -51,7 +52,7 @@ int main(){
 
 /*---------------------------------------------------Deck Initialization-------------------------------------------------------*/
 void initializeDeck() {
-    const char *suites[] = {"Spades", "Hearts", "Clubs", "Diamonds"};
+    const char *suits[] = {"Spades", "Hearts", "Clubs", "Diamonds"};
     const char *ranks[] = {"Ace", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Queen", "King"};
 
     int dCount = 0;
@@ -64,7 +65,7 @@ void initializeDeck() {
         for(int jj = 0; jj < 13; jj++) {
             globalCards[dCount].count = jj + 1;
             globalCards[dCount].rank = ranks[jj];
-            globalCards[dCount].suite = suites[j];
+            globalCards[dCount].suit = suits[j];
             dCount++;
         }
     }
@@ -79,7 +80,18 @@ void mainMenu() {  // Requirement FL1: The product shall include a Menu
     int check=1;
     char term;
     printf("-----------------------------------------------\n");
-    printf("            Welcome to Blackjack                \n");
+    printf("            Welcome to Blackjack               \n");
+    printf("          _____                                \n");
+    printf("         |A .  | _____                         \n");
+    printf("         | /.\\ ||A ^  | _____                 \n");
+    printf("         |(_._)|| / \\ ||A _  | _____          \n");
+    printf("         |  |  || \\ / || ( ) ||A_ _ |         \n");
+    printf("         |____V||  .  ||(_'_)||( v )|          \n");
+    printf("                |____V||  |  || \\ / |         \n");
+    printf("                       |____V||  .  |          \n");
+    printf("                              |____V|          \n");
+    printf("Developed by Leilani, Alex, Javier, Joss\n");
+    printf("(ACSII art credit: ejm98)\n");
     printf("-----------------------------------------------\n\n");
     printf("1. Start New Game\n"); // Requirement FR1: The system should provide a menu with at least three options (Play, How to Play, Exit)
     printf("2. Rules/Tutorial\n");
@@ -121,7 +133,7 @@ void mainMenu() {  // Requirement FL1: The product shall include a Menu
 }
 /*---------------------------------------------------Game Manager--------------------------------------------------------*/
 void game() {
-    delay(100);
+    //delay(500);
     printf("\n-----------------------------------------------\n");
     printf("              NEW GAME STARTING                \n");
     printf("-----------------------------------------------\n");
@@ -141,12 +153,14 @@ void game() {
       playerBet=betting(playerBet);
 
       // Deal initial cards to player and dealer from shared deck
-      struct cards* playerHand=cardManager(playerSize);
+      struct cards* playerHand1=cardManager(playerSize);
+      struct cards* playerHand2=cardManager(playerSize); // Leilani's note: I don't think this is quite right
       struct cards* dealerHand=cardManager(dealerSize);
 
+      // Pending: implement if-statement to check for second hand and print it also if it's there
       printf("\nYour hand consists of:");
-      printCards(playerHand,playerSize);
-      printf("\n\nDealer shows: %s of %s", dealerHand[0].rank, dealerHand[0].suite);
+      printCards(playerHand1,playerSize);
+      printf("\n\nDealer shows: %s of %s", dealerHand[0].rank, dealerHand[0].suit);
       printf("\n(Dealer's second card is hidden)\n");
 
       // Alternating turns between player and dealer
@@ -166,7 +180,7 @@ void game() {
           printf("-----------------------------------------------\n");
 
           while(repeat==1) {
-            playerAction = playerTurn(&playerHand, &playerSize);
+            playerAction = playerTurn(&playerHand1, &playerSize);
 
             if(playerAction == 0) { // Player busted
               playerBusted = 1;
@@ -183,7 +197,7 @@ void game() {
               playerStanding = 1;
               repeat=0;
             }
-            else if(playerAction==3){
+            else if(playerAction==3){ // Player doubles down
               playerStanding=1;
               playerInitialBet=playerBet.bet;
               playerBet=doubleDown(playerBet);
@@ -194,6 +208,10 @@ void game() {
                 repeat=0;
               }
 
+            }
+            else if(playerAction==4){ // Player splits
+              playerStanding = 0; // Placeholder
+              //
             }
           }
         }
@@ -224,9 +242,10 @@ void game() {
       }
 
       // Determine winner
-      int playerTotal = handValue(playerHand, playerSize);
+      int playerTotal = handValue(playerHand1, playerSize);
+      int playerTotalSecondHand = handValue(playerHand2, playerSize);
       int dealerTotal = handValue(dealerHand, dealerSize);
-      int result=determineWinner(playerTotal, dealerTotal);
+      int result=determineWinner(playerTotal, playerTotalSecondHand, dealerTotal);
       switch(result){
         case 1:
           playerBet.balance+=payOut(playerBet);
@@ -239,12 +258,13 @@ void game() {
           break;
       }
 
-      free(playerHand);
+      free(playerHand1);
+      free(playerHand2);
       free(dealerHand);
 
       printf("\n");
       if(playerBet.balance<=0){
-        printf("\nYou're out of money! Game Over.\n");
+        printf("\n\e[1;31mYou're out of money! Game Over.\n");
         gameOver=1;
       }
       else{
@@ -260,7 +280,7 @@ void game() {
 /*---------------------------------------------------Cards Section-------------------------------------------------------*/
 void printCards(struct cards hand[], int size){
   for(int i=0; i<size;i++){
-      printf("\n  %s of %s",hand[i].rank,hand[i].suite);
+      printf("\n  %s of %s",hand[i].rank,hand[i].suit);
   }
 }
 
@@ -287,7 +307,7 @@ struct cards* cardManager(int hCount) {
             if(globalAvail[cardIndex] == 1) {
                 globalAvail[cardIndex] = 0; // Mark card as used
                 handCard[ii].rank = globalCards[cardIndex].rank;
-                handCard[ii].suite = globalCards[cardIndex].suite;
+                handCard[ii].suit = globalCards[cardIndex].suit;
                 handCard[ii].count = globalCards[cardIndex].count;
                 found = 1;
             }
@@ -298,17 +318,19 @@ struct cards* cardManager(int hCount) {
 }
 
 /*-----------------------------------------------------------------Player Turn--------------------------------------------*/
-// 0 = bust, 1 = hit, 2 = stand
+// 0 = bust, 1 = hit, 2 = stand, 3 = double down, 4 = split
 int playerTurn(struct cards** hand, int* size){
   int total=handValue(*hand, *size);
   int action;
   char term;
   int check=1;
+  int val = 0;
+  int isSplit = 0;
 
   printf("\nYour current hand:");
   printCards(*hand, *size);
   printf("\n\nYour hand value is: %d",total);
-  printf("\nEnter 1 to Hit\nEnter 2 to Stand\nEnter 3 to Double Down"); // Requirement FL3: The product shall include a UI to allow the play to hit, hold, split
+  printf("\nEnter 1 to Hit\nEnter 2 to Stand\nEnter 3 to Double Down\nEnter 4 to Split"); // Requirement FL3: The product shall include a UI to allow the play to hit, hold, split
   printf("\nInput: "); // Requirement FR3: The system should allow user actions (Hit, Hold, Double Down, Split)
 
   check=1;
@@ -318,8 +340,8 @@ int playerTurn(struct cards** hand, int* size){
           getchar();
           check=1;
       }
-      else if(action != 1 && action != 2 && action != 3) {
-          printf("\nInvalid Input (must be 1, 2 or 3)\n\nInput: ");
+      else if(action != 1 && action != 2 && action != 3 && action != 4) {
+          printf("\nInvalid Input (must be 1, 2, 3, or 4)\n\nInput: ");
           check=1;
       }
       else {
@@ -339,16 +361,16 @@ int playerTurn(struct cards** hand, int* size){
     (*hand)[*size-1]=newCard[0];
     free(newCard);
 
-    printf("\nYou drew: %s of %s",(*hand)[*size-1].rank,(*hand)[*size-1].suite);
+    printf("\nYou drew: %s of %s",(*hand)[*size-1].rank,(*hand)[*size-1].suit);
 
     total=handValue(*hand,*size);
-    printf("\nYour new hand value: %d\n",total);
+    //printf("\nYour new hand value: %d\n",total);
 
     if(total>21){
       printf("\n\nYour hand:");
       printCards(*hand,*size); // Requirement FR7: The system should track and display point totals after every hand
       printf("\n\nTotal is over 21: %d",total);
-      printf("\nBust! You lose!\n");
+      printf("\n\e[1;31mBust! You lose!\n");
       return 0; // Busted
     }
     else if(total==21){
@@ -361,7 +383,7 @@ int playerTurn(struct cards** hand, int* size){
     printf("\nYou stand with a total of: %d\n",total);
     return 2; // Standing
   }
-  else if(action==3){
+  else if(action==3){ // Double Down
     *size+=1;
     *hand=realloc(*hand,sizeof(struct cards)*(*size));
     if(*hand==NULL){
@@ -373,11 +395,33 @@ int playerTurn(struct cards** hand, int* size){
     (*hand)[*size-1]=newCard[0];
     free(newCard);
 
-    printf("\nYou drew: %s of %s",(*hand)[*size-1].rank,(*hand)[*size-1].suite);
+    printf("\nYou drew: %s of %s",(*hand)[*size-1].rank,(*hand)[*size-1].suit);
 
     total=handValue(*hand,*size);
-    printf("\nYour new hand value: %d\n",total);
+    //printf("\nYour new hand value: %d\n",total);
     return 3;
+  }
+  else if(action==4){ // Split
+    if (isSplit == 1){
+      printf("\nYou've split already.\n");
+    }
+    
+    else if ((*hand)[0].rank == (*hand)[1].rank){
+      isSplit = 1;
+      struct cards **secondHand;
+      *secondHand=malloc(sizeof(struct cards)*(*size));
+      secondHand[0] = hand[1];
+      //free(hand[1]);
+      //*hand=realloc(*hand,sizeof(struct cards)*(*size));
+      //total=handValue(*secondHand,*size); // Segmentation fault error indicates this is a problem
+      printf("\nYour second hand value: %s\n",secondHand);
+      
+    }
+    else{
+      printf("\nYou can't split this hand.\n");
+      delay(500);
+    }
+    return 4;
   }
   return 2; // Default to standing
 }
@@ -406,7 +450,7 @@ int dealerTurn(struct cards** hand, int* size){
     (*hand)[*size-1]=newCard[0];
     free(newCard);
 
-    printf("\nDealer drew: %s of %s",(*hand)[*size-1].rank,(*hand)[*size-1].suite);
+    printf("\nDealer drew: %s of %s",(*hand)[*size-1].rank,(*hand)[*size-1].suit);
 
     total=handValue(*hand,*size);
     printf("\nDealer's new hand value: %d\n",total);
@@ -424,7 +468,7 @@ int dealerTurn(struct cards** hand, int* size){
 }
 
 /*---------------------------------------------------Determine Winner----------------------------------------------------*/
-int determineWinner(int playerTotal, int dealerTotal){
+int determineWinner(int playerTotal, int playerSecondTotal, int dealerTotal){
   delay(500);
   printf("\n-----------------------------------------------\n");
   printf("                  RESULTS                      \n");
@@ -437,11 +481,11 @@ int determineWinner(int playerTotal, int dealerTotal){
     return 0;
   }
   else if(dealerTotal>21){
-    printf("\nDealer busts! You win!\n"); // Requirement FR5: The system should declare outcomes (Bust, Blackjack, Win, Loss, Tie)
+    printf("\nDealer busts! \e[1;32mYou win!\n"); // Requirement FR5: The system should declare outcomes (Bust, Blackjack, Win, Loss, Tie)
     return 1;
   }
   else if(playerTotal>dealerTotal){
-    printf("\nYou win!\n");
+    printf("\n\e[1;32mYou win!\n");
     return 1;
   }
   else if(playerTotal<dealerTotal){
@@ -576,6 +620,11 @@ int payOut(struct bets bet){
   int pay=bet.bet+bet.bet/2;
   return pay;
 }
+
+/*int split(){
+
+}*/
+
 
 /*---------------------------------------------------Tutorial Section-------------------------------------------------------*/
 void tutorial() { // Requirement FL2: The product shall include a Tutorial to teach the player how to play
