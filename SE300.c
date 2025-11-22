@@ -38,12 +38,12 @@ void printCards(struct cards card[], int count);
 int playerTurn(struct cards** hand, int* size);
 int handValue(struct cards* hand, int size);
 int dealerTurn(struct cards** hand, int* size);
-int determineWinner(int playerTotal, int playerSecondTotal, int dealerTotal);
+int determineWinner(int playerTotal, int dealerTotal);
 int payOut(struct bets bet);
 void delay(int mili);
 
 int main(){
-  printf("***********GAME START**********\n");
+  printf("\e[1;0m***********GAME START**********\n");
   srand(time(NULL)); // Initialize random seed once at start
   mainMenu();
 
@@ -79,7 +79,7 @@ void mainMenu() {  // Requirement FL1: The product shall include a Menu
     int loop=1;
     int check=1;
     char term;
-    printf("-----------------------------------------------\n");
+    printf("\e[1;0m-----------------------------------------------\n");
     printf("            Welcome to Blackjack               \n");
     printf("          _____                                \n");
     printf("         |A .  | _____                         \n");
@@ -243,9 +243,9 @@ void game() {
 
       // Determine winner
       int playerTotal = handValue(playerHand1, playerSize);
-      int playerTotalSecondHand = handValue(playerHand2, playerSize);
+      //int playerTotalSecondHand = handValue(playerHand2, playerSize);
       int dealerTotal = handValue(dealerHand, dealerSize);
-      int result=determineWinner(playerTotal, playerTotalSecondHand, dealerTotal);
+      int result=determineWinner(playerTotal, dealerTotal);
       switch(result){
         case 1:
           playerBet.balance+=payOut(playerBet);
@@ -268,7 +268,7 @@ void game() {
         gameOver=1;
       }
       else{
-        printf("\nStarting next round...\n");
+        printf("\n\e[1;0mStarting next round...\n");
         initializeDeck(); // Reset deck for next round
         playerSize = 2;
         dealerSize = 2;
@@ -370,7 +370,7 @@ int playerTurn(struct cards** hand, int* size){
       printf("\n\nYour hand:");
       printCards(*hand,*size); // Requirement FR7: The system should track and display point totals after every hand
       printf("\n\nTotal is over 21: %d",total);
-      printf("\n\e[1;31mBust! You lose!\n");
+      printf("\n\e[1;31mBust! You lose\e[1;0m!\n");
       return 0; // Busted
     }
     else if(total==21){
@@ -468,7 +468,7 @@ int dealerTurn(struct cards** hand, int* size){
 }
 
 /*---------------------------------------------------Determine Winner----------------------------------------------------*/
-int determineWinner(int playerTotal, int playerSecondTotal, int dealerTotal){
+int determineWinner(int playerTotal, int dealerTotal){
   delay(500);
   printf("\n-----------------------------------------------\n");
   printf("                  RESULTS                      \n");
@@ -481,7 +481,7 @@ int determineWinner(int playerTotal, int playerSecondTotal, int dealerTotal){
     return 0;
   }
   else if(dealerTotal>21){
-    printf("\nDealer busts! \e[1;32mYou win!\n"); // Requirement FR5: The system should declare outcomes (Bust, Blackjack, Win, Loss, Tie)
+    printf("\nDealer busts! \e[1;32mYou win\e[1;0m!\n"); // Requirement FR5: The system should declare outcomes (Bust, Blackjack, Win, Loss, Tie)
     return 1;
   }
   else if(playerTotal>dealerTotal){
